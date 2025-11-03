@@ -3,6 +3,9 @@ package com.ecom.services;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatusCode;
@@ -11,17 +14,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.ecom.dtos.FakeStoreReadProductResponseDto;
+import com.ecom.dtos.FakeStoreWriteProductRequestDto;
 import com.ecom.dtos.FakeStoreWriteProductResponseDto;
 import com.ecom.exceptions.NoProductsFoundException;
 import com.ecom.exceptions.ProductNotCreatedException;
 import com.ecom.exceptions.ProductNotFoundException;
+import com.ecom.models.Category;
 import com.ecom.models.Product;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-@Service
+
+@Primary
+@Service("FakeStoreProductService")
 @RequiredArgsConstructor
-public class FakeStoreProductService implements ProductService {
+public class FakeStoreProductService implements ProductService{
 	
 	@NonNull
 	RestTemplate restTemplate;
@@ -36,28 +43,40 @@ public class FakeStoreProductService implements ProductService {
 		return FakeStoreReadProductResponseDto.toProduct();
 	}
 
-	public List<Product> getAllProducts() throws NoProductsFoundException {
+	public Page<Product> getAllProducts(int pageNumber, int pageSize) throws NoProductsFoundException {
 		FakeStoreReadProductResponseDto[] FakeStoreReadProductResponseDtos = restTemplate.getForObject("https://fakestoreapi.com/products", FakeStoreReadProductResponseDto[].class);
 		if(FakeStoreReadProductResponseDtos == null) {
-			throw new NoProductsFoundException("There are no products");
+			throw new NoProductsFoundException();
 		}
 		List<Product> products = new ArrayList();
 		for(FakeStoreReadProductResponseDto FakeStoreReadProductResponseDto: FakeStoreReadProductResponseDtos) {
 			Product product = FakeStoreReadProductResponseDto.toProduct();
 			products.add(product);
 		}
-		return products;
+		return null;
 	}
 
-	public Product createProduct(Product product) throws ProductNotCreatedException {
+	public Product createProduct(String name, String description, double price, String categoryName, String image) throws ProductNotCreatedException {
 		String url = "https://fakestoreapi.com/products";
-		FakeStoreWriteProductResponseDto FakeStoreWriteProductResponseDto = restTemplate.postForObject(url, product, FakeStoreWriteProductResponseDto.class);
+		FakeStoreWriteProductRequestDto fakeStoreWriteProductRequestDto = createDtoFromParams(name, description, price, categoryName, image);
+		FakeStoreWriteProductResponseDto FakeStoreWriteProductResponseDto = restTemplate.postForObject(url, fakeStoreWriteProductRequestDto, FakeStoreWriteProductResponseDto.class);
 		if(FakeStoreWriteProductResponseDto == null) {
 			throw new ProductNotCreatedException("Requested product not created");
 		}
-		product = FakeStoreWriteProductResponseDto.toProduct();
+		Product product = FakeStoreWriteProductResponseDto.toProduct();
 		System.out.println(product.getImageUrl());
 		return product;
+	}
+
+	private FakeStoreWriteProductRequestDto createDtoFromParams(String name, String description, double price,
+			String categoryName, String image) {
+		FakeStoreWriteProductRequestDto fakeStoreWriteProductRequestDto = new FakeStoreWriteProductRequestDto();
+		fakeStoreWriteProductRequestDto.setName(name);
+		fakeStoreWriteProductRequestDto.setPrice(price);
+		Category category = new Category();
+		category.setName(name);
+		fakeStoreWriteProductRequestDto.setCategory(category);
+		return fakeStoreWriteProductRequestDto;
 	}
 
 	public Product putProduct(long id, Product product) {
@@ -67,5 +86,19 @@ public class FakeStoreProductService implements ProductService {
 		HttpStatusCode httpStatusCode = updateproductResponseEntity.getStatusCode();
 		return updateproductResponseEntity.getBody().toProduct();
 	}
+
+	@Override
+	public Page<Product> getProductByName(String name, int pageNumber, int pageSize) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Product> getProductsBySpec(Specification<Product> spec) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 }

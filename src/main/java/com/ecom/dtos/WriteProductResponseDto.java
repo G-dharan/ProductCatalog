@@ -18,7 +18,7 @@ public class WriteProductResponseDto {
 	public static WriteProductResponseDto from(Product product) {
 		WriteProductResponseDto writeProductResponseDto = new WriteProductResponseDto();
 		writeProductResponseDto.setId(product.getId());
-		writeProductResponseDto.setTitle(product.getTitle());
+		writeProductResponseDto.setTitle(product.getName());
 		writeProductResponseDto.setDescription(product.getDescription());
 		writeProductResponseDto.setPrice(product.getPrice());
 		if(product.getCategory() != null) {

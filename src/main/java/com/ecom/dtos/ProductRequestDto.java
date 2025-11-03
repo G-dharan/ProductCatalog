@@ -19,7 +19,7 @@ public class ProductRequestDto {
 	public Product toProduct() {
 		Product product = new Product();
 		product.setId(this.id);
-		product.setTitle(this.getTitle());
+		product.setName(this.getTitle());
 		product.setDescription(this.getDescription());
 		product.setPrice(this.getPrice());
 		

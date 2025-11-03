@@ -18,7 +18,7 @@ public class ReadProductResponseDto {
 	public static ReadProductResponseDto from(Product product) {
 		ReadProductResponseDto readProductResponseDto = new ReadProductResponseDto();
 		readProductResponseDto.setId(product.getId());
-		readProductResponseDto.setTitle(product.getTitle());
+		readProductResponseDto.setTitle(product.getName());
 		readProductResponseDto.setDescription(product.getDescription());
 		readProductResponseDto.setPrice(product.getPrice());
 		if(product.getCategory() != null) {

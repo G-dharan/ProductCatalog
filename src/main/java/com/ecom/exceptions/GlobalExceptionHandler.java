@@ -1,5 +1,7 @@
 package com.ecom.exceptions;
 
+import java.util.NoSuchElementException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,14 +11,22 @@ import com.ecom.dtos.ErrorDto;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-	@ExceptionHandler(ProductNotFoundException.class)
+	@ExceptionHandler({ProductNotFoundException.class, NoSuchElementException.class})
 	public ResponseEntity<ErrorDto> productNotFoundException(Exception e) {
 		 ErrorDto errorDto = new ErrorDto();
 		 errorDto.setStatus("Failure");
 		 errorDto.setMessage(e.getMessage());
 		 return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.NOT_FOUND);
 	}
-	
+
+	@ExceptionHandler({IllegalArgumentException.class})
+	public ResponseEntity<ErrorDto> IllegalArgumentException(Exception e) {
+		 ErrorDto errorDto = new ErrorDto();
+		 errorDto.setStatus("Failure");
+		 errorDto.setMessage(e.getMessage());
+		 return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.NOT_FOUND);
+	}
+
 	@ExceptionHandler(NoProductProvidedException.class)
 	public ResponseEntity<ErrorDto> NoProductProvidedException(Exception e) {
 		 ErrorDto errorDto = new ErrorDto();
@@ -24,7 +34,7 @@ public class GlobalExceptionHandler {
 		 errorDto.setMessage(e.getMessage());
 		 return new ResponseEntity<ErrorDto>(errorDto, HttpStatus.BAD_REQUEST);
 	}
-	
+
 	@ExceptionHandler(ProductNotCreatedException.class)
 	public ResponseEntity<ErrorDto> ProductNotCreatedException(Exception e) {
 		 ErrorDto errorDto = new ErrorDto();

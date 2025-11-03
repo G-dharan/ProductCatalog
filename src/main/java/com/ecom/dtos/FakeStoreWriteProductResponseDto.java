@@ -18,7 +18,7 @@ public class FakeStoreWriteProductResponseDto {
 	public Product toProduct() {
 		Product product = new Product();
 		product.setId(this.getId());
-		product.setTitle(this.getTitle());
+		product.setName(this.getTitle());
 		product.setDescription(this.getDescription());
 		product.setPrice(this.getPrice());
 		
