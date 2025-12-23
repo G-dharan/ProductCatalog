@@ -1,6 +1,7 @@
 package com.ecom.controllers;
 
 
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -8,7 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,9 +19,7 @@ import com.ecom.dtos.ProductRequestDto;
 import com.ecom.dtos.ReadProductResponseDto;
 import com.ecom.dtos.WriteProductResponseDto;
 import com.ecom.exceptions.InvalidCategoryException;
-import com.ecom.exceptions.NoProductProvidedException;
 import com.ecom.exceptions.NoProductsFoundException;
-import com.ecom.exceptions.ProductNotCreatedException;
 import com.ecom.exceptions.ProductNotFoundException;
 import com.ecom.models.Product;
 import com.ecom.services.ProductService;
@@ -41,30 +39,39 @@ public class ProductController {
 	@GetMapping("/products/{id}")
 	public ReadProductResponseDto getProductById(@PathVariable("id") long id) throws ProductNotFoundException {
 		Product product = productService.getProduct(id);
+		System.out.println(product.getName());
 		ReadProductResponseDto readProductResponseDto = ReadProductResponseDto.from(product);
 		return readProductResponseDto;
 	}
 	
 	
-	@GetMapping("/products/")
-	public List<ReadProductResponseDto> getProducts(@RequestBody ProductRequestDto productRequestDto) throws ProductNotFoundException {
-		Specification<Product> spec = Specification.where(ProductSpecifications.hasName(productRequestDto.getTitle()))
-			    .and(ProductSpecifications.hasPrice(productRequestDto.getPrice()));
+	@GetMapping("/products")
+	public List<ReadProductResponseDto> getProducts(@RequestParam(required = false, name = "name") String name, 
+			@RequestParam(required = false, name = "priceGreaterThan") Double priceGreaterThan, 
+			@RequestParam(required = false, name = "priceLesserThan") Double priceLesserThan, 
+			@RequestParam(required = false, name = "description") String description, 
+			@RequestParam(required = false, name = "category") String category) throws ProductNotFoundException {
+		
+		Specification<Product> spec = Specification.where(ProductSpecifications.hasName(name))
+			    .and(ProductSpecifications.hasPriceGreaterThan(priceGreaterThan))
+			    .and(ProductSpecifications.hasPriceLesserThan(priceLesserThan))
+			    .and(ProductSpecifications.hasDescription(description));
+//			    .and(ProductSpecifications.hasCategory(category));
 
 		List<Product> products = productService.getProductsBySpec(spec);
 		return products.stream().map(product -> ReadProductResponseDto.from(product)).toList();
 	}
-	
-	@GetMapping("/products")
-	public Page<ReadProductResponseDto> getProductByName(@RequestParam("name") String name, @RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) throws ProductNotFoundException {
-		System.out.println(name);
-		Page<Product> products = productService.getProductByName(name, pageNumber, pageSize);
-//		System.out.println(products);
-		Page<ReadProductResponseDto> productResponseDtos = products.map(ReadProductResponseDto::from);
-//		System.out.println(productResponseDtos);
-//		List<ReadProductResponseDto> productResponseDtos =products.stream().map(ReadProductResponseDto::from).toList();
-		return productResponseDtos;
-	}
+
+//	@GetMapping("/products")
+//	public Page<ReadProductResponseDto> getProductByName(@RequestParam("name") String name, @RequestParam("pageNumber") int pageNumber, @RequestParam("pageSize") int pageSize) throws ProductNotFoundException {
+//		System.out.println(name);
+//		Page<Product> products = productService.getProductByName(name, pageNumber, pageSize);
+////		System.out.println(products);
+//		Page<ReadProductResponseDto> productResponseDtos = products.map(ReadProductResponseDto::from);
+////		System.out.println(productResponseDtos);
+////		List<ReadProductResponseDto> productResponseDtos =products.stream().map(ReadProductResponseDto::from).toList();
+//		return productResponseDtos;
+//	}
 	
 	@GetMapping("/products/{pageNumber}/{pageSize}")
 	public Page<ReadProductResponseDto> getAllProducts(@PathVariable("pageNumber") int pageNumber, @PathVariable("pageSize")  int pageSize)  throws NoProductsFoundException {

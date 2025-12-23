@@ -1,5 +1,7 @@
 package com.ecom.dtos;
 
+import java.util.HashMap;
+
 import com.ecom.models.Category;
 import com.ecom.models.Product;
 
@@ -15,6 +17,9 @@ public class ProductRequestDto {
 	private String description;
 	private String category;
 	private String image;
+	
+	private HashMap<String, String> filterBy;
+	private HashMap<String, String> sortBy;
 	
 	public Product toProduct() {
 		Product product = new Product();

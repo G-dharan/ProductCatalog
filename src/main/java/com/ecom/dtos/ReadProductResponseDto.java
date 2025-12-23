@@ -1,5 +1,6 @@
 package com.ecom.dtos;
 
+import com.ecom.models.Category;
 import com.ecom.models.Product;
 
 import lombok.Getter;
@@ -21,9 +22,19 @@ public class ReadProductResponseDto {
 		readProductResponseDto.setTitle(product.getName());
 		readProductResponseDto.setDescription(product.getDescription());
 		readProductResponseDto.setPrice(product.getPrice());
-		if(product.getCategory() != null) {
+//		if(product.getCategory() != null) {
 			readProductResponseDto.setCategoryName(product.getCategory().getName());
-		}
+//		}
+		readProductResponseDto.setImage(product.getImageUrl());
+		return readProductResponseDto;
+	}
+	
+	public static ReadProductResponseDto productWoCategory(Product product) {
+		ReadProductResponseDto readProductResponseDto = new ReadProductResponseDto();
+		readProductResponseDto.setId(product.getId());
+		readProductResponseDto.setTitle(product.getName());
+		readProductResponseDto.setDescription(product.getDescription());
+		readProductResponseDto.setPrice(product.getPrice());
 		readProductResponseDto.setImage(product.getImageUrl());
 		return readProductResponseDto;
 	}
